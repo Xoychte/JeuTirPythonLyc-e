@@ -6,7 +6,7 @@ from math import*
 from random import randint
 from constr import *
 # Initialisation des variables
-(largeur, hauteur) = (800, 600)  # definit la hauteur et la largeur de la fenêtre de l'application
+(width, height) = (800, 600)  # definit la height et la width de la fenêtre de l'application
 WHITE=(255, 255, 255)   # Définit la couleur blanche
 RED=(255,0,0)   #Définit la couleur rouge
 BLUE=(0,0,255)
@@ -15,28 +15,24 @@ BLACK=(0,0,0)
 YELLOW=(223, 230, 0)
 colors=[RED, BLUE, GREEN, BLACK, YELLOW]
 missile_x=200   #Définit l'emplacement horizontal du missile
-missile_y=hauteur-50   #Définit l'emplacement horizontal du missile
+missile_y=height-50   #Définit l'emplacement horizontal du missile
 
-baliste = [Balle()]
+listOfBalls = [Balle()]
 
-balleY=20   # on place la balle à 20 de hauteur
-
-
-balleX = randint(0, largeur)  #Place la balle aléatoirement sur l'axe horizontal
 balle_rayon=20   # taille de la balle
-print(balleX)
+
 FPS = 60    #Nombre d'images par secondes
-gagne=0
-perdu=0
-mspeed_mult = 1
-bspeed_mult = 1
+score=0
+ballsMissed=0
+missileSpeedMultiplier = 1
+ballSpeedMultiplier = 1
 timer = 0
 
 
 #Initialisation de la bibliothèque Pygame
 pygame.init()
 clock = pygame.time.Clock()  # créer un système permettant de gérer le temps
-fenetre = pygame.display.set_mode((largeur, hauteur), RESIZABLE) #Création de la fenêtre redimensionnable
+fenetre = pygame.display.set_mode((width, height), RESIZABLE) #Création de la fenêtre redimensionnable
 fenetre.fill(WHITE)
 missile = pygame.image.load("reworkmissile.png").convert_alpha()
 #Chargement image en rendant le blanc de l'image transparent
@@ -57,17 +53,17 @@ while continuer:
 
     clock.tick(FPS)   
 
-    text1_obj = font_obj.render('Score: '+str(gagne), True, RED, WHITE)  #Affichage d'un texte score
-    text2_obj = font_obj.render('Perdu: '+str(perdu), True, BLUE, WHITE)
-    text3_obj = font_obj.render('Vitesse du missile / '+str(mspeed_mult), True, BLUE, WHITE)
-    text4_obj = font_obj.render('Vitesse de la balle * '+str(bspeed_mult), True, RED, WHITE)
+    text1_obj = font_obj.render('Score: '+str(score), True, RED, WHITE)  #Affichage d'un texte score
+    text2_obj = font_obj.render('Perdu: '+str(ballsMissed), True, BLUE, WHITE)
+    text3_obj = font_obj.render('Vitesse du missile / '+str(missileSpeedMultiplier), True, BLUE, WHITE)
+    text4_obj = font_obj.render('Vitesse de la balle * '+str(ballSpeedMultiplier), True, RED, WHITE)
     text5_obj = font_obj.render('RESET', True, RED, WHITE)
     if missile_run == 1:
-        missile_y -= 10 / mspeed_mult
+        missile_y -= 10 / missileSpeedMultiplier
         
         if missile_y < 0:
             missile_run = 0
-            missile_y = hauteur-50
+            missile_y = height-50
 
     
  
@@ -95,7 +91,7 @@ while continuer:
         elif keys[pygame.K_d]:
             timer += 1
             if timer == 1:
-                baliste.append(Balle())
+                listOfBalls.append(Balle())
             elif timer == 15:
                 timer = 0
             
@@ -107,30 +103,30 @@ while continuer:
             if 0 < mouseY < 20:
                 if 400 < mouseX < 532:
 
-                    mspeed_mult += 0.5
+                    missileSpeedMultiplier += 0.5
                 elif 600 < mouseX < 719:
                     print("Vitesse balle up")
-                    bspeed_mult += 0.5
+                    ballSpeedMultiplier += 0.5
                 elif 750 < mouseX < 800:
                     print("reset")
-                    perdu = 0
-                    gagne = 0
-                    bspeed_mult = 1
-                    mspeed_mult = 1
-                    baliste.clear()
-                    baliste.append(Balle())
+                    ballsMissed = 0
+                    score = 0
+                    ballSpeedMultiplier = 1
+                    missileSpeedMultiplier = 1
+                    listOfBalls.clear()
+                    listOfBalls.append(Balle())
 
-    for i in baliste:     #On passe par toutes les balles
+    for i in listOfBalls:     #On passe par toutes les balles
         
-        if i.y > hauteur :     #Quand la balle atteint le bas
-            perdu = perdu + 1
+        if i.y > height :     #Quand la balle atteint le bas
+            ballsMissed = ballsMissed + 1
             i.speedy = 0
             i.y = 50
         
-        i.x=i.x+i.speedx * bspeed_mult  #rôle:déplacer la balle
+        i.x=i.x+i.speedx * ballSpeedMultiplier  #rôle:déplacer la balle
         i.y=i.y+i.speedy
         
-        if i.x>largeur-balle_rayon :  #Rebonds sur les bords
+        if i.x>width-balle_rayon :  #Rebonds sur les bords
             i.speedx=-i.speedx
             i.speedy = randint(0,3)
         if i.x<balle_rayon :
@@ -141,11 +137,11 @@ while continuer:
         dist_x = abs(missile_x - i.x)
         if dist_y < 25 and dist_x < 25 and missile_run == 1:  #hitbox de la balle
             missile_run = 0
-            missile_y = hauteur-50
+            missile_y = height-50
             i.speedy = 0
             i.y = 50
-            gagne += 1
-            i.x = randint(0 + balle_rayon, largeur - balle_rayon)
+            score += 1
+            i.x = randint(0 + balle_rayon, width - balle_rayon)
 
         pygame.draw.circle(fenetre,colors[i.color],(int(i.x),i.y),balle_rayon)
             
